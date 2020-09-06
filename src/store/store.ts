@@ -1,11 +1,11 @@
 export class Store {
-  private subscriber: Function[];
+  private subscribers: Function[];
   private reducers: { [key: string]: Function };
   private state: { [key: string]: any };
 
   constructor(reducers = {}, initialState = {}) {
+    this.subscribers = [];
     this.reducers = reducers;
-    // this.state = initialState;
     this.state = this.reduce(initialState, {});
   }
 
@@ -13,8 +13,21 @@ export class Store {
     return this.state;
   }
 
+  subscribe(fn) {
+    this.subscribers = [...this.subscribers, fn];
+    this.notify();
+    return () => {
+      this.subscribers = this.subscribers.filter((sub) => sub !== fn);
+    };
+  }
+
   dispatch(action) {
     this.state = this.reduce(this.state, action);
+    this.notify();
+  }
+
+  private notify() {
+    this.subscribers.forEach((fn) => fn(this.value));
   }
 
   private reduce(state, action) {

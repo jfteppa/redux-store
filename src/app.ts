@@ -13,8 +13,6 @@ const reducers = {
 
 const store = new fromStore.Store(reducers);
 
-console.log(store.value);
-
 button.addEventListener(
   "click",
   () => {
@@ -29,12 +27,18 @@ button.addEventListener(
       payload,
     });
 
-    console.log(store.value);
+    // console.log(store.value);
 
     input.value = "";
   },
   false
 );
+
+const unsubscribe = store.subscribe((state) => {
+  renderTodos(state.todos.data);
+});
+
+destroy.addEventListener("click", unsubscribe, false);
 
 todoList.addEventListener("click", function (event) {
   const target = event.target as HTMLButtonElement;
@@ -42,3 +46,5 @@ todoList.addEventListener("click", function (event) {
     console.log(target);
   }
 });
+
+store.subscribe((state) => console.log("STATE:::", state));
